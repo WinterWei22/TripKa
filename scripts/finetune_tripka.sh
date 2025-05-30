@@ -2,7 +2,7 @@ data_path='./tripka/examples/MM/conf6'
 MASTER_PORT=10152
 task_name="dwar_small"
 head_name='chembl_small'
-weight_path='/home/weiwt/workspace/pKa/Uni-pKa/weights/tgt_pretrain_update'
+weight_path='weights/tgt_pretrain_update'
 n_gpu=1
 
 # train params

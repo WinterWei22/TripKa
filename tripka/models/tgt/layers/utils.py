@@ -82,7 +82,7 @@ def prob_masking(x, prob_mat, mask_ratio):
 
     N, i, j = prob_mat.shape
     prob = prob_mat.view(N, i * j)
-    len_keep = min(int(L * (1 - mask_ratio)), torch.count_nonzero(prob, dim=1).min().item())   # 最大mask值
+    len_keep = min(int(L * (1 - mask_ratio)), torch.count_nonzero(prob, dim=1).min().item())
 
     ids_shuffle = torch.argsort(prob, dim=1)
     ids_restore = torch.argsort(ids_shuffle, dim=1)

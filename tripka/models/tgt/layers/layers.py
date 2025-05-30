@@ -53,7 +53,7 @@ class EGT_Attention(nn.Module):
         Q, K, V = self.lin_QKV(h_ln).chunk(3, dim=-1)   # [b, nodes, node_width]
         E, G = self.lin_EG(e_ln).chunk(2, dim=-1)   # [b, nodes, nodes, num_heads]
         
-        if self.source_dropout > 0 and self.training:   # sampling to drop under the prob of 'source_dropout', finfn:float最小值
+        if self.source_dropout > 0 and self.training:   # sampling to drop under the prob of 'source_dropout'
             rmask = h.new_empty(size=[bsize,1,num_nodes,1])\
                      .bernoulli_(self.source_dropout)\
                          * torch.finfo(mask.dtype).min

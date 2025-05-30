@@ -132,9 +132,9 @@ class TGTPKAModel(BaseUnicoreModel):
         
         """Heads"""
         if args.masked_token_loss > 0:
-            self.token_pred = MaskLMHead(layer_configs['node_width'], len(dictionary), activation_fn='gelu')  # 需要注意token是否加入了[CLS]等符号
+            self.token_pred = MaskLMHead(layer_configs['node_width'], len(dictionary), activation_fn='gelu')
         if args.masked_charge_loss > 0:
-            self.charge_pred = MaskLMHead(layer_configs['node_width'], len(charge_dictionary), activation_fn='gelu')  # 需要注意charge是否加入了[CLS]等符号
+            self.charge_pred = MaskLMHead(layer_configs['node_width'], len(charge_dictionary), activation_fn='gelu')
         if args.masked_coord_loss > 0:
             self.pair2coord_proj = NonLinearHead(
                 layer_configs['edge_width'], 1, 'gelu'

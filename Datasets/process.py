@@ -42,12 +42,12 @@ def get_Confs(smiles, num_confs=5, max_attempts=1000, max_retries=1,seed=1):
                         coords[atom_id] = [pos.x, pos.y, pos.z]
                     
                     conformers.append(coords)
-                print(f"成功生成 {len(conformers)} 个构象")
+                print(f"successfully generated {len(conformers)} conformers")
             else:
-                raise ValueError("未能生成构象")
+                raise ValueError("conformer generation failed")
         except Exception as e:
             retries += 1
-            print(f"生成构象失败，重新尝试({retries}/{max_retries}):...")
+            print(f"re-trying ({retries}/{max_retries}):...")
             
     if not conformers:
         return None
@@ -57,14 +57,13 @@ def get_Confs(smiles, num_confs=5, max_attempts=1000, max_retries=1,seed=1):
 def get_Confs_MM(smiles, num_confs=5, seed=0):
     try:
         mol = Chem.MolFromSmiles(smiles)
-        mol = Chem.AddHs(mol)  # 添加氢原子
+        mol = Chem.AddHs(mol)
         conformers = AllChem.EmbedMultipleConfs(mol, numConfs=num_confs, randomSeed=seed)
         for conf_id in range(len(conformers)):
-        # 对每个构象进行优化
             AllChem.MMFFOptimizeMolecule(mol, confId=conf_id)
             
         num_atoms = mol.GetNumAtoms()
-        coordinates = np.zeros((num_confs, num_atoms, 3))  # 初始化 ndarray
+        coordinates = np.zeros((num_confs, num_atoms, 3))
 
         for conf_id in range(num_confs):
             conf = mol.GetConformer(conf_id)

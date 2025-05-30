@@ -9,41 +9,34 @@ from tqdm import tqdm
 import math
 
 def get_Confs(mol, num_confs=5, max_attempts=1000, max_retries=1):
-    # 嵌入参数设置
     params = AllChem.ETKDG()
     params.maxAttempts = max_attempts
-    params.useRandomCoords = True  # 允许使用随机坐标
-    params.enforceChirality = False  # 放松手性约束
+    params.useRandomCoords = True
+    params.enforceChirality = False
 
     conformers = []
     retries = 0
-    # 尝试生成构象，直到成功
     while not conformers and retries < max_retries:
         try:
-            # 尝试嵌入构象
             conf_ids = AllChem.EmbedMultipleConfs(mol, numConfs=num_confs, params=params)
             
-            # 检查是否生成了构象
             if conf_ids:
                 conformers = []
                 for conf_id in conf_ids:
                     conformer = mol.GetConformer(conf_id)
                     num_atoms = mol.GetNumAtoms()
                     
-                    # 提取每个构象的坐标，并存为ndarray
                     coords = np.zeros((num_atoms, 3))
                     for atom_id in range(num_atoms):
                         pos = conformer.GetAtomPosition(atom_id)
                         coords[atom_id] = [pos.x, pos.y, pos.z]
                     
-                    # 将坐标添加到列表
                     conformers.append(coords)
-                # print(f"成功生成 {len(conformers)} 个构象")
             else:
-                raise ValueError(f"未能生成构象: {mol}")
+                raise ValueError(f"fialed at: {mol}")
         except Exception as e:
             retries += 1
-            print(f"生成构象失败，重新尝试({retries}/{max_retries}):...")
+            print(f"re-trying ({retries}/{max_retries}):...")
             
     if not conformers:
         return None
@@ -53,7 +46,7 @@ def get_Confs(mol, num_confs=5, max_attempts=1000, max_retries=1):
 def smiles_to_atoms_coordinates_charge(smiles, num_confs=1, conf_type='ETKDG'):
     mol = Chem.MolFromSmiles(smiles)
     if mol is None:
-        raise ValueError("无法从SMILES生成分子对象")
+        raise ValueError("failed")
     
     mol = Chem.AddHs(mol)
     if conf_type == 'ETKDG':
@@ -63,7 +56,6 @@ def smiles_to_atoms_coordinates_charge(smiles, num_confs=1, conf_type='ETKDG'):
 
     AllChem.ComputeGasteigerCharges(mol)
     
-    # 获取原子列表
     atoms = [atom.GetSymbol() for atom in mol.GetAtoms()]
     charges = [float(atom.GetProp("_GasteigerCharge")) for atom in mol.GetAtoms()]
     
@@ -73,11 +65,10 @@ def get_Confs_MM(mol, num_confs=5):
     try:
         conformers = AllChem.EmbedMultipleConfs(mol, numConfs=num_confs, params=AllChem.ETKDG())
         for conf_id in range(len(conformers)):
-        # 对每个构象进行优化
             AllChem.MMFFOptimizeMolecule(mol, confId=conf_id)
             
         num_atoms = mol.GetNumAtoms()
-        coordinates = np.zeros((num_confs, num_atoms, 3))  # 初始化 ndarray
+        coordinates = np.zeros((num_confs, num_atoms, 3))
 
         for conf_id in range(num_confs):
             conf = mol.GetConformer(conf_id)
@@ -176,15 +167,14 @@ def pickle2lmdb(conf_type, dataset_name, total_samples):
         def has_isolated_hydrogens(smiles):
             mol = Chem.MolFromSmiles(smiles)
             if mol is None:
-                return False  # 如果 SMILES 无效
+                return False
 
-            # 遍历所有原子，检查是否有孤立的氢原子
             for atom in mol.GetAtoms():
-                if atom.GetAtomicNum() == 1:  # 检查氢原子
+                if atom.GetAtomicNum() == 1:
                     neighbors = atom.GetNeighbors()
                     if len(neighbors) == 0:
-                        return False  # 找到孤立的氢原子
-            return True  # 没有孤立的氢原子
+                        return False
+            return True
 
         txn_write = env_new.begin(write = True)
 
@@ -198,10 +188,8 @@ def pickle2lmdb(conf_type, dataset_name, total_samples):
             for row in tqdm(input):
                 smiles = row['SMILES']
                 left_smi = smiles.split('>>')[0].split(',')
-                # print(left_smi)
                 right_smi = smiles.split('>>')[1].split(',')
-                # print(right_smi)
-                if len(left_smi[0]) > 100:  # 筛选大于100的分子
+                if len(left_smi[0]) > 100:
                     continue
                 smi_lens.append(len(left_smi[0]))
 
@@ -211,26 +199,17 @@ def pickle2lmdb(conf_type, dataset_name, total_samples):
                     row['FEATURES_A'][i]['smi'] = left_smi[i]
                     confs = row['FEATURES_A'][i]['coordinates']
                     if confs is None or len(confs) != num_confs :wrong_mol =True
-                    # print(len(row['FEATURES_A'][i]['coordinates']))
-                    # print(row['FEATURES_A'][i]['coordinates'][0].shape)
                     if num_confs == 1:
                         row['FEATURES_A'][i]['coordinates'] = row['FEATURES_A'][i]['coordinates'][0]
-                    # confs = get_Confs(left_smi[i], num_confs=num_confs)
-                    # confs = None
-                    # row['FEATURES_A'][i]['coordinates'] = confs if confs is not None and len(confs) == num_confs else np.tile(row['FEATURES_A'][i]['coordinates'], (num_confs, 1, 1))
 
                 for i, r in enumerate(row['FEATURES_B']):
                     if has_isolated_hydrogens(right_smi[i]) == False:   wrong_mol = True
                     row['FEATURES_B'][i]['smi'] = right_smi[i]  
                     confs = row['FEATURES_B'][i]['coordinates']
                     if confs is None or len(confs) != num_confs :wrong_mol =True
-                    # print(len(row['FEATURES_A'][i]['coordinates']))
                     if num_confs == 1:
                         row['FEATURES_B'][i]['coordinates'] = row['FEATURES_B'][i]['coordinates'][0]
-                    # confs = get_Confs(right_smi[i], num_confs=num_confs)
-                    # confs = None
-                    # row['FEATURES_B'][i]['coordinates'] = confs if confs is not None and len(confs) == num_confs else np.tile(row['FEATURES_B'][i]['coordinates'], (num_confs, 1, 1))
-                
+           
                 if wrong_mol == True : 
                     wrong_num+=1
                     continue

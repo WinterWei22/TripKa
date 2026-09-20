@@ -21,7 +21,7 @@ To set up the required `conda` environment, follow the instructions in [Uni-Core
 
 ## Datasets
 
-Datasets are available at [Google Drive](https://drive.google.com/drive/folders/1lmo2o7qcpgK121NfV4JkwGEeeSZRf1kA?usp=sharing). Download and unzip all files, then place them in the `./Datasets/pickle` directory.
+Datasets and checkpoints are available at [Google Drive](https://drive.google.com/drive/folders/1lmo2o7qcpgK121NfV4JkwGEeeSZRf1kA?usp=sharing). Download and unzip all files, then place data files in the `./Datasets/pickle` directory, as well as checkpoints in the `./checkpoints/` directory.
 
 ## Data Preprocessing
 

@@ -7,6 +7,24 @@ from rdkit.Chem import AllChem
 from tqdm import tqdm
 import argparse
 import os
+import shutil
+
+
+def copy_dictionary_files(output_dir):
+    """Copy the dictionaries required by the TripKa data loader.
+
+    Inference scripts load each sampled dataset from ``tripka/examples/<type>/<i>``
+    and expect both dictionaries to be next to that dataset.  Resolve the source
+    from this file's location so the copy does not depend on the caller's cwd.
+    """
+    examples_dir = os.path.abspath(
+        os.path.join(os.path.dirname(__file__), '..', 'tripka', 'examples')
+    )
+    os.makedirs(output_dir, exist_ok=True)
+    for dictionary_name in ('dict_charge.txt', 'dict.txt'):
+        source = os.path.join(examples_dir, dictionary_name)
+        destination = os.path.join(output_dir, dictionary_name)
+        shutil.copy2(source, destination)
 
 def get_Confs(smiles, num_confs=5, max_attempts=1000, max_retries=1,seed=1):
     mol = Chem.MolFromSmiles(smiles)
@@ -91,27 +109,27 @@ if __name__ == '__main__':
     mid_name = 'MM' if args.mm else 'ETKDG'
     if name == 'sampl6':
         filename='./Datasets/pickle/sampl6.pickle'
-        outfiledir = f'./tripka/examples/{mid_name}/conf{args.num_conf}/{args.i}/sampl6_macro_regen'
+        outfiledir = f'./tripka/examples/{mid_name}/{args.i}/sampl6_macro_regen'
         outfilename = f'{outfiledir}/sampl6_macro_regen.lmdb'
     elif name == 'sampl7':
         filename='./Datasets/pickle/sampl7.pickle'
-        outfiledir = f'./tripka/examples/{mid_name}/conf{args.num_conf}/{args.i}/sampl7_macro_regen'
+        outfiledir = f'./tripka/examples/{mid_name}/{args.i}/sampl7_macro_regen'
         outfilename = f'{outfiledir}/sampl7_macro_regen.lmdb'
     elif name == 'sampl8':
         filename='./Datasets/pickle/sampl8.pickle'
-        outfiledir = f'./tripka/examples/{mid_name}/conf{args.num_conf}/{args.i}/sampl8_macro_regen'
+        outfiledir = f'./tripka/examples/{mid_name}/{args.i}/sampl8_macro_regen'
         outfilename = f'{outfiledir}/sampl8_macro_regen.lmdb'
     elif name == 'novartis_a':
         filename='./Datasets/pickle/novartis_acid.pickle'
-        outfiledir = f'./tripka/examples/{mid_name}/conf{args.num_conf}/{args.i}/novartis_a'
+        outfiledir = f'./tripka/examples/{mid_name}/{args.i}/novartis_a'
         outfilename = f'{outfiledir}/novartis_a.lmdb'
     elif name == 'novartis_b':
         filename='./Datasets/pickle/novartis_base.pickle'
-        outfiledir = f'./tripka/examples/{mid_name}/conf{args.num_conf}/{args.i}/novartis_b'
+        outfiledir = f'./tripka/examples/{mid_name}/{args.i}/novartis_b'
         outfilename = f'{outfiledir}/novartis_b.lmdb'
     elif name == 'dwar_small':
         filename='./Datasets/pickle/dwar-iBond.pickle'
-        outfiledir = f'./tripka/examples/{mid_name}/conf{args.num_conf}/dwar_small'
+        outfiledir = f'./tripka/examples/{mid_name}/{args.i}/dwar_small'
         outfilename = f'{outfiledir}/dwar_small.lmdb'
     elif name == 'chembl_train':
         filename='./Datasets/pickle/chembl_train.pickle'
@@ -124,6 +142,11 @@ if __name__ == '__main__':
         filename='./Datasets/pickle/chembl_valid.pickle'
         outfiledir = f'./tripka/examples/{mid_name}/conf{args.num_conf}/chembl_small'
         outfilename = f'{outfiledir}/valid.lmdb'
+
+    # Keep dictionaries beside every sampled dataset so the inference loader
+    # can resolve them from ./tripka/examples/<type>/<sample_index>.
+    sample_dir = f'{outfiledir}/../'
+    copy_dictionary_files(sample_dir)
 
     if not os.path.exists(outfiledir):
         os.makedirs(outfiledir)

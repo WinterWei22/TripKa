@@ -2,11 +2,13 @@
 
 <p align='center'><img src='./fig/tripka.png' alt='Overview of TripK<sub>a</sub> architecture.' width='100%'></p>
 
+This work is based on the paper [*TripK<sub>a</sub>: Accurate and Scalable Acid–Base Dissociation Property Prediction via Triplet Interaction Networks and Physical Knowledge*](https://pubs.acs.org/doi/10.1021/acs.jcim.6c00330).
+
 TripK<sub>a</sub> is an advanced macro- and micro-pK<sub>a</sub> predictor designed to address the challenges of modeling complex atomic interactions and limited high-quality data in molecular discovery. By leveraging a triplet interaction network and integrating quantum-level physical knowledge, TripK<sub>a</sub> effectively captures cooperative and competitive effects in multi-site protonation equilibria. It achieves state-of-the-art performance on the SAMPL6–8 and Novartis datasets. Pretrained on pK<sub>a</sub> data, TripK<sub>a</sub> serves as a robust foundation for molecular property prediction and interaction modeling, providing deeper insights into molecular ionization for downstream applications.
 
 ## Installation
 
-To set up the required `conda` environment, follow the instructions in [Uni-Core](https://github.com/dptech-corp/Uni-Core) and refer to its [Installation Documentation](https://github.com/dptech-corp/Uni-Core#installation).
+TripKa requires a customized Uni-Core `0.0.1`: first install [official Uni-Core](https://github.com/dptech-corp/Uni-Core#installation) compatible with your Python, PyTorch, and CUDA environment, then overlay the bundled `unicore/` and `unicore_cli/` sources onto the installed packages as described in the [configuration instructions](unicore/README.md#applying-the-snapshot). The official package alone does not include the TripKa-specific modifications.
 
 <!-- Additional dependencies are listed below:
 
@@ -21,7 +23,7 @@ To set up the required `conda` environment, follow the instructions in [Uni-Core
 
 ## Datasets
 
-Datasets and checkpoints are available at [Google Drive](https://drive.google.com/drive/folders/1lmo2o7qcpgK121NfV4JkwGEeeSZRf1kA?usp=sharing). Download and unzip all files, then place data files in the `./Datasets/pickle` directory, as well as checkpoints in the `./checkpoints/` directory.
+Datasets and checkpoints are available at [Google Drive](https://drive.google.com/drive/folders/1lmo2o7qcpgK121NfV4JkwGEeeSZRf1kA?usp=sharing). Download and unzip all files, then place data files in the `./Datasets/pickle` directory, as well as checkpoints in the `./checkpoint/` directory.
 
 ## Data Preprocessing
 
@@ -111,3 +113,21 @@ bash scripts/infer_tripka_qm.sh novartis_a 10 MM 0 8
 ## Acknowledgement
 
 This project builds upon the codebases of `Uni-pKa` and `TGT`. We express our gratitude to the authors for their valuable contributions.
+
+## Citation
+
+If you use TripK<sub>a</sub> in your research, please cite:
+
+```bibtex
+@article{wei2026tripka,
+  title   = {{TripK}$_a$: Accurate and Scalable Acid--Base Dissociation Property Prediction via Triplet Interaction Networks and Physical Knowledge},
+  author  = {Wei, Wentao and Rao, Jiahua and Xue, Bai and Xie, Jiancong and Xu, Dahao and Sun, Xichen and Lu, Yutong and Wang, Yu and Yang, Mingjun and Yang, Yuedong},
+  journal = {Journal of Chemical Information and Modeling},
+  year    = {2026},
+  volume  = {66},
+  number  = {8},
+  pages   = {4525--4537},
+  doi     = {10.1021/acs.jcim.6c00330},
+  url     = {https://pubs.acs.org/doi/10.1021/acs.jcim.6c00330}
+}
+```

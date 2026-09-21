@@ -27,7 +27,7 @@ echo "params setting lr: $lr, bs: $bs, epoch: $epoch, dropout: $dropout, warmup:
 update_freq=`expr $bs / $local_batch_size`
 python -m torch.distributed.launch --use-env --nproc_per_node=$n_gpu --master_port=$MASTER_PORT $(which unicore-train) $data_path --task-name $task_name --user-dir ./tripka --train-subset train --valid-subset valid \
         --conf-size $conf_size \
-        --num-workers 8 --ddp-backend=no_c10d \
+        --num-workers 0 --ddp-backend=no_c10d \
         --dict-name $dict_name --charge-dict-name $charge_dict_name \
         --task tgt_pka --loss $loss_func --arch tgt_pka  \
         --classification-head-name $head_name --num-classes $task_num \

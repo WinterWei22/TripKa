@@ -35,7 +35,7 @@ export NCCL_ASYNC_ERROR_HANDLING=1
 export OMP_NUM_THREADS=1
 CUDA_VISIBLE_DEVICES=0,1,2,3 python -m torch.distributed.launch --use-env --nproc_per_node=$n_gpu --master_port=$MASTER_PORT $(which unicore-train) $data_path --task-name $task_name --user-dir ./tripka --train-subset train --valid-subset valid \
         --conf-size $conf_size \
-        --num-workers 8 --ddp-backend=c10d \
+        --num-workers 0 --ddp-backend=c10d \
         --dict-name $dict_name --charge-dict-name $charge_dict_name \
         --task tgt_pka_mlm --loss $loss_func --arch tgt_pka  \
         --classification-head-name $task_name --num-classes $task_num \

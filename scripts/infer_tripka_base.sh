@@ -27,12 +27,12 @@ do
 
        CUDA_VISIBLE_DEVICES=$cuda_device python ./tripka/infer.py --user-dir ./tripka ${data_path}  --task-name $infer_task --valid-subset $infer_task \
               --results-path $results_path  \
-              --num-workers 8 --ddp-backend=c10d --batch-size $batch_size \
+              --num-workers 0 --ddp-backend=c10d --batch-size $batch_size \
               --task tgt_pka --loss $loss_func --arch tgt_pka \
               --classification-head-name $head_name --num-classes $task_num \
               --dict-name $dict_name --charge-dict-name $charge_dict_name --conf-size $conf_size \
               --only-polar $only_polar  \
-              --path $model_path/checkpoint_best.pt \
+              --path $model_path/checkpoint_inference.pt \
               --log-interval 50 --log-format simple --required-batch-size-multiple 1 \
               --tgt-config $model_path/model.yaml \
               --seed 42 --confidence

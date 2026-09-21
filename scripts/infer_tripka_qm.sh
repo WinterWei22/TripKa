@@ -32,7 +32,7 @@ do
               --classification-head-name $head_name --num-classes $task_num \
               --dict-name $dict_name --charge-dict-name $charge_dict_name --conf-size $conf_size \
               --only-polar $only_polar  \
-              --path $model_path/checkpoint_inference.pt \
+              --path $model_path/checkpoint_best.pt \
               --fp16 --fp16-init-scale 4 --fp16-scale-window 256 \
               --log-interval 50 --log-format simple --required-batch-size-multiple 1 \
               --tgt-config $model_path/model.yaml \
